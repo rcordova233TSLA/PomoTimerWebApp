@@ -1,13 +1,12 @@
 export class TaskItem
 {
     id:number
-    label:string
+    label:string|null = null;
     description:string|null = null;
     projectName:string|null = null;
 
-    constructor(id:number,label:string)
+    constructor(id:number)
     {
         this.id = id
-        this.label = label
-    }  
+    }
 }

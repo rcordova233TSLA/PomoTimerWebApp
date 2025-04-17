@@ -23,7 +23,8 @@ export class StorageSaverService {
             const map = new Map(value.value);
             for (const [k, v] of value.value) {
                 // Create a real TaskItem instance
-                const task = Object.assign(new TaskItem(0, ""), v); // Default constructor args
+                // TODO Just got rid of label description
+                const task = Object.assign(new TaskItem(0), v); // Default constructor args
                 map.set(Number(k), task);
             }
             return map;
