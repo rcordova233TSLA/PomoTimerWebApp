@@ -54,6 +54,11 @@ export class TaskFetcherService {
         maxId = Math.max(...Array.from(this.taskMap.keys()));
         return maxId;
     }
+    addTask(task:TaskItem):void
+    {
+        this.taskMap.set(task.id,task);
+        this.storageSaver.saveTaskMapToStorage(this.taskMap);
+    }
     testMapSaving()
     {
         this.taskMap.set(1, new TaskItem(1))
