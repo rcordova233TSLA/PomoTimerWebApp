@@ -71,9 +71,13 @@ export class TaskFetcherService {
      * @param project Project to assign task under, defaults to NoProject
      */
     // TODO don't need project param, can use project in Task
-    addTask(task:TaskItem,project:string="NoProject"):void
+    addTask(task:TaskItem):void
     {
-        this.taskDatabase.addToMap(task,project);
+        if (task.projectName!=null)
+        {
+            this.taskDatabase.intializeProjectSub(task.projectName)
+        }
+        this.taskDatabase.addTask(task);
         //Push update to localstorage 
         // this.storageSaver.updateProject(project,taskArray);
     }
@@ -82,36 +86,4 @@ export class TaskFetcherService {
     {
         return this.taskDatabase.getAllTasks();
     }
-
-
-
-
-/*
-    getListForProject(project:string):Array<TaskItem>
-    {
-        const listToReturn:Array<TaskItem>|undefined = this.taskMap.get(project);
-        if (listToReturn == undefined)
-        {
-            return new Array<TaskItem>();
-        }
-        return listToReturn;
-
-    }
-
-
-*/
-/*    
-
-
-    testMapSaving()
-    {
-        this.taskMap.set(1, new TaskItem(1))
-        console.log("Map before storage save");
-        console.log(this.taskMap);
-        this.storageSaver.saveTaskMapToStorage(this.taskMap);
-        console.log("Map after storage save");
-        this.taskMap = this.storageSaver.getTaskMapFromStorage();
-        console.log(this.taskMap);
-    }
-*/
 }

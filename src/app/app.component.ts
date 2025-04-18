@@ -6,7 +6,7 @@ import { NavbarComponent } from "./navbar/navbar.component";
 import { TaskListComponent } from "./task-list/task-list.component";
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavbarComponent, TaskListComponent],
+  imports: [RouterOutlet, NavbarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   standalone:true
