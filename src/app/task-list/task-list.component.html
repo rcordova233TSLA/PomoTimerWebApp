@@ -1,0 +1,11 @@
+<ul>
+    @for (task of taskList; track $index) {
+        <app-task-card
+            [id]="task.id"
+            [description]="task.description"
+            [label]="task.label"
+            [project]="task.projectName"
+        >
+        </app-task-card>
+    }
+</ul>
