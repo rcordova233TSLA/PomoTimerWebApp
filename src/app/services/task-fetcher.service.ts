@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { TaskItem } from './TaskItem';
 import { StorageSaverService } from './storage-saver.service';
+import { TaskDatabase } from './TaskDatabase';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TaskFetcherService {
-	taskMap:Map<number,TaskItem>;
+	// taskMap:Map<String,Array<TaskItem>>;
+    taskDatabase:TaskDatabase;
 	// Get from local storage
 	saveToUnkownProj()
 	{
@@ -18,7 +20,22 @@ export class TaskFetcherService {
 	}
 	constructor(private storageSaver:StorageSaverService) 
 	{
+
+        /*
 		// Get map from local storage or initialize to empty
+        if (storageSaver.isDataInStorage())
+        {
+            this.taskMap = storageSaver.getAllData();
+        }
+        else
+        {
+            this.taskMap = new Map<string,Array<TaskItem>>();
+        }
+        */
+        this.taskDatabase = new TaskDatabase();
+
+
+        /*
         if (window.localStorage.getItem('Database'))
         {
             this.taskMap = storageSaver.getTaskMapFromStorage()
@@ -28,32 +45,59 @@ export class TaskFetcherService {
             this.taskMap = new Map<number,TaskItem>();
         }
         // this.testMapSaving()
+        */
 	}
+    /* 
+    Task Add/Edit Functions
+    */
     createTask()
     {
-        const maxId = this.getMaxId();
-        let newTask:TaskItem = new TaskItem(maxId+1)
+        const nextAvailableId = this.taskDatabase.getNextAvailableId();
+        console.log(`nextAvailableId: ${nextAvailableId}`);
+        
+        let newTask:TaskItem = new TaskItem(nextAvailableId);
         return newTask;
     }
     getTask(id:number):TaskItem|null
     {
-        let taskReturned:any = null;
-        for (const [key,task] of this.taskMap)
-        {
-            if (id == key)
-            {
-                taskReturned = task;
-            }
-        }
+        let taskReturned:TaskItem|null;
+        taskReturned = this.taskDatabase.getTask(id);
         return taskReturned
     }
+
+
+
+
+
     /**
      * 
-     * @returns current max id or 0 if no tasks in map
+     * @param task TaskItem to add to map and local storage 
+     * @param project Project to assign task under, defaults to NoProject
      */
+    addTask(task:TaskItem,project:string="NoProject"):void
+    {
+        this.taskDatabase.addToMap(task,project);
+        //Push update to localstorage 
+        // this.storageSaver.updateProject(project,taskArray);
+    }
+/*
+    getListForProject(project:string):Array<TaskItem>
+    {
+        const listToReturn:Array<TaskItem>|undefined = this.taskMap.get(project);
+        if (listToReturn == undefined)
+        {
+            return new Array<TaskItem>();
+        }
+        return listToReturn;
+
+    }
+
+
+*/
+/*    
     getMaxId():number
     {
-        let maxId:number
+        let maxId:number;
         if (this.taskMap.keys.length==0)
         {
             maxId=0;
@@ -64,16 +108,11 @@ export class TaskFetcherService {
         }
         return maxId;
     }
-    addTask(task:TaskItem):void
-    {
-        this.taskMap.set(task.id,task);
-        this.storageSaver.saveTaskMapToStorage(this.taskMap);
-    }
-
     getTasksAsList()
     {
         return Array.from(this.taskMap.values())
     }
+
     testMapSaving()
     {
         this.taskMap.set(1, new TaskItem(1))
@@ -84,4 +123,5 @@ export class TaskFetcherService {
         this.taskMap = this.storageSaver.getTaskMapFromStorage();
         console.log(this.taskMap);
     }
+*/
 }
