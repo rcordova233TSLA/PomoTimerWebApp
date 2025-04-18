@@ -19,8 +19,15 @@ export class TaskFetcherService {
 	constructor(private storageSaver:StorageSaverService) 
 	{
 		// Get map from local storage or initialize to empty
-        this.taskMap = new Map<number,TaskItem>();
-        this.testMapSaving()
+        if (window.localStorage.getItem('Database'))
+        {
+            this.taskMap = storageSaver.getTaskMapFromStorage()
+        }
+        else
+        {
+            this.taskMap = new Map<number,TaskItem>();
+        }
+        // this.testMapSaving()
 	}
     createTask()
     {
@@ -51,13 +58,21 @@ export class TaskFetcherService {
         {
             maxId=0;
         }
-        maxId = Math.max(...Array.from(this.taskMap.keys()));
+        else
+        {
+            maxId = Math.max(...Array.from(this.taskMap.keys()));
+        }
         return maxId;
     }
     addTask(task:TaskItem):void
     {
         this.taskMap.set(task.id,task);
         this.storageSaver.saveTaskMapToStorage(this.taskMap);
+    }
+
+    getTasksAsList()
+    {
+        return Array.from(this.taskMap.values())
     }
     testMapSaving()
     {

@@ -10,7 +10,7 @@ import {MatCardModule} from '@angular/material/card'
 })
 export class TaskCardComponent {
     @Input() id!:number;
-    @Input() label!:string;
+    @Input() label!:string|null;
     @Input() description:string|null=null;
     @Input() project:string|null=null;
 }
