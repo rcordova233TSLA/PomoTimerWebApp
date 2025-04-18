@@ -100,5 +100,16 @@ export class TaskDatabase
 
     }
 
+    getAllTasks():Array<TaskItem>
+    {
+        const allTasks = new Array<TaskItem>
+        const combinedArray:Array<TaskItem>  = []
+        for (const [key,taskList] of this.taskMap)
+        {
+            combinedArray.concat(taskList);
+        }
+        return combinedArray;
+    }
+
 
 }
