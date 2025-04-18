@@ -1,7 +1,21 @@
-<div class="card" style="width: 18rem;">
+<!-- <div class="card" style="width: 18rem;">
     <div class="card-body">
       <h5 class="card-title">Sample Task Title</h5>
       <h6 class="card-subtitle mb-2 text-muted">Project</h6>
       <p class="card-text">Estimated time/Complete time<p>
     </div>
+</div> -->
+<div class="card">
+    <mat-card appearance="outlined">
+        <mat-card-header> 
+            <mat-card-title>
+                {{id}}| {{label}}  
+            </mat-card-title>
+        </mat-card-header>
+        <!-- <div class="container"> -->
+
+            <mat-card-content *ngIf="description" >{{description}} </mat-card-content>
+        <!-- </div> -->
+        <mat-card-footer *ngIf="project"> {{project}} </mat-card-footer>
+    </mat-card>
 </div>

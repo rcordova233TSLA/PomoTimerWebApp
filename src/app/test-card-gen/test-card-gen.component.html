@@ -1,3 +1,19 @@
 <button>
     Click me to generate card
 </button>
+
+<h1>Sample Card</h1>
+<app-task-card
+    [id]="1"
+    [label]= "'A sample task'"
+>
+</app-task-card>
+<h1>Sample card with description/project</h1>
+<app-task-card
+    [id]="2"
+    [label]= "'A sample task with extra stuff'"
+    [project]="'NewProject'"
+    [description]="'This is a task with some description'"
+>
+    
+</app-task-card>
