@@ -26,10 +26,7 @@ export class TaskListComponent implements OnInit,OnDestroy {
         {
             this.subjectKey = "ALL"
         }
-        else
-        {
-            this.taskFetcher.taskDatabase.intializeProjectSub(this.subjectKey);
-        }
+        // this.taskFetcher.taskDatabase.intializeProjectSub(this.subjectKey);
         const subjectRef = this.taskFetcher.taskDatabase.getSubject(this.subjectKey)!;
         this.subscription = subjectRef.subscribe({
             next: (v)=>{

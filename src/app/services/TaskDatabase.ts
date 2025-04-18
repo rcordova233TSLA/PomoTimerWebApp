@@ -19,8 +19,8 @@ export class TaskDatabase
         this.taskMap = new Map<string,Array<TaskItem>>;
         this.taskIds = new Array<number>;
         this.projectSubjects = new Map<string,BehaviorSubject<Array<TaskItem>>>;
-        this.intializeProjectSub(DatabaseKeys.All);
-        this.intializeProjectSub(DatabaseKeys.NoProject);
+        // this.intializeProjectSub(DatabaseKeys.All);
+        // this.intializeProjectSub(DatabaseKeys.NoProject);
     }
 
     /*
@@ -45,6 +45,11 @@ export class TaskDatabase
     setTaskMap(inMap:Map<string,TaskItem[]>)
     {
         this.taskMap = inMap;
+        // Restore subjects
+        this.restoreSubjects();
+        // Update subjects
+        this.updateAllSubjects();
+
     }
     /**
      * 
@@ -59,6 +64,10 @@ export class TaskDatabase
     */
     getTaskForProj(projectName:string):TaskItem[]|undefined
     {
+        if (projectName==DatabaseKeys.All)
+        {
+            return this.getAllTasks();
+        }
         return this.taskMap.get(projectName)
     }
     getTask(id:number): TaskItem | null
@@ -188,14 +197,35 @@ export class TaskDatabase
      */
     getSubject(project:string):Subject<Array<TaskItem>> | undefined
     {
+        this.intializeProjectSub(project);
         return this.projectSubjects.get(project);
     }
 
     updateSubject(projectName:string,newVal:TaskItem[])
     {
+        this.intializeProjectSub(projectName);
         const projSub = this.projectSubjects.get(projectName)!;
         projSub.next(newVal);
     }
-
+    updateAllSubjects():void
+    {
+        for (const [project,subject] of this.projectSubjects)
+        {
+            if (this.getTaskForProj(project) == undefined)
+            {
+                continue;
+            }
+            subject.next(this.getTaskForProj(project)!)
+        }
+    }
+    restoreSubjects():void
+    {
+        //Default
+        this.intializeProjectSub(DatabaseKeys.All);
+        for (const key of this.taskMap.keys())
+        {
+            this.intializeProjectSub(key);
+        }
+    }
 
 }
