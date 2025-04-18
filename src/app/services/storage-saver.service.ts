@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TaskItem } from "./TaskItem";
-import { JsonPipe } from '@angular/common';
-
+import { DatabaseKeys } from './TaskDatabase';
 @Injectable({
   providedIn: 'root'
 })
@@ -21,19 +20,29 @@ export class StorageSaverService {
      * 
      * @returns Get a map of all task items in local storage
      */
-    getAllData(): Map<String,Array<TaskItem>>
+    getMapData(): Map<string,Array<TaskItem>>
     {
-        const mapToReturn = new Map<String,Array<TaskItem>>;
+        const mapToReturn = new Map<string,Array<TaskItem>>;
         const storageSize = window.localStorage.length
         
         for (let i=0;i<storageSize;i++)
         {
             const key:string = window.localStorage.key(i)!;
+            if (key == DatabaseKeys.TaskIds)
+            {
+                continue;
+            }
             // Should be array of tasks, will fail if nontask items are in localstorage
             const val:Array<TaskItem> = this.getTasksForProj(key)!;
             mapToReturn.set(key!,val)	
         }
         return mapToReturn
+    }
+    
+    getTaskIds():Array<number>
+    {
+        const taskIds:Array<number> = JSON.parse(window.localStorage.getItem(DatabaseKeys.TaskIds)!);
+        return taskIds;
     }
     /**
      * 
@@ -46,6 +55,11 @@ export class StorageSaverService {
         window.localStorage.setItem(key,arrayJsonStr);
     }
     
+    updateTaskIds(newArray:Array<number>)
+    {
+        const arrayJsonStr:string = JSON.stringify(newArray);
+        window.localStorage.setItem(DatabaseKeys.TaskIds,arrayJsonStr)
+    }
     /**
      * 
      * @param key Project name to attempt to retrieve from storage
@@ -66,6 +80,7 @@ export class StorageSaverService {
     
     
     
+    /*
     
     getTaskMapFromStorage():Map<number,TaskItem>
     {
@@ -105,4 +120,6 @@ export class StorageSaverService {
             return value;
             }
     }
+    */
+
 }

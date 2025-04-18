@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TaskItem } from './TaskItem';
 import { StorageSaverService } from './storage-saver.service';
-import { TaskDatabase } from './TaskDatabase';
+import { DatabaseKeys, TaskDatabase } from './TaskDatabase';
 
 @Injectable({
   providedIn: 'root'
@@ -21,31 +21,18 @@ export class TaskFetcherService {
 	constructor(private storageSaver:StorageSaverService) 
 	{
 
-        /*
-		// Get map from local storage or initialize to empty
-        if (storageSaver.isDataInStorage())
-        {
-            this.taskMap = storageSaver.getAllData();
-        }
-        else
-        {
-            this.taskMap = new Map<string,Array<TaskItem>>();
-        }
-        */
         this.taskDatabase = new TaskDatabase();
-
-
-        /*
-        if (window.localStorage.getItem('Database'))
+        if (this.taskDatabase.getSizeTaskMap() == 0)
         {
-            this.taskMap = storageSaver.getTaskMapFromStorage()
+            if (storageSaver.isDataInStorage())
+            {
+                this.taskDatabase.setTaskIds(storageSaver.getTaskIds());
+                console.log("Got task ids from storage");
+                this.taskDatabase.setTaskMap(storageSaver.getMapData());
+                console.log("Got tasks from storage");
+                
+            }
         }
-        else
-        {
-            this.taskMap = new Map<number,TaskItem>();
-        }
-        // this.testMapSaving()
-        */
 	}
     /* 
     Task Add/Edit Functions
@@ -56,6 +43,7 @@ export class TaskFetcherService {
         console.log(`nextAvailableId: ${nextAvailableId}`);
         
         let newTask:TaskItem = new TaskItem(nextAvailableId);
+        //Update used taskIds in local storage
         return newTask;
     }
     getTask(id:number):TaskItem|null
@@ -73,13 +61,14 @@ export class TaskFetcherService {
     // TODO don't need project param, can use project in Task
     addTask(task:TaskItem):void
     {
-        if (task.projectName!=null)
+        if (task.projectName!=DatabaseKeys.NoProject)
         {
             this.taskDatabase.intializeProjectSub(task.projectName)
         }
         this.taskDatabase.addTask(task);
-        //Push update to localstorage 
-        // this.storageSaver.updateProject(project,taskArray);
+        // Update project in local storage
+        this.storageSaver.updateProject(task.projectName,this.taskDatabase.getTaskForProj(task.projectName)!)
+        this.storageSaver.updateTaskIds(this.taskDatabase.getTaskIds()) 
     }
 
     getAllTasks()

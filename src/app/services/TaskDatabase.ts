@@ -1,6 +1,10 @@
 import { BehaviorSubject, Subject } from "rxjs";
 import { TaskItem } from "./TaskItem";
-
+export enum DatabaseKeys{
+    All="ALL",
+    NoProject = "NOPROJECT",
+    TaskIds = "TASKIDS"
+}
 export class TaskDatabase
 {
     private taskMap:Map<string,Array<TaskItem>>;
@@ -15,42 +19,48 @@ export class TaskDatabase
         this.taskMap = new Map<string,Array<TaskItem>>;
         this.taskIds = new Array<number>;
         this.projectSubjects = new Map<string,BehaviorSubject<Array<TaskItem>>>;
-        this.intializeProjectSub("ALL");
-        this.intializeProjectSub("NOPROJ");
-    }
-
-    /**
-     * 
-     * @param project Project to attempt intialization of new subject
-     * @returns true if subject does not exist, false if project subject already initialized
-     */
-    intializeProjectSub(project:string):boolean
-    {   
-        if(this.projectSubjects.get(project) == undefined)
-        {
-            const newSubject = new BehaviorSubject<TaskItem[]>([])
-            this.projectSubjects.set(project,newSubject);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /**
-     * 
-     * @param project Project to attempt to get subject for
-     * @returns subject or undefined if no subject has been initialized
-     */
-    getSubject(project:string):Subject<Array<TaskItem>> | undefined
-    {
-        return this.projectSubjects.get(project);
+        this.intializeProjectSub(DatabaseKeys.All);
+        this.intializeProjectSub(DatabaseKeys.NoProject);
     }
 
     /*
+    DataStructure fetching
+    */
+    getSizeTaskMap():number
+    {
+        return this.taskMap.size;
+    }
+    /**
+     * 
+     * @returns copy of taskIds at the snapshot function is called
+     */
+    getTaskIds():Array<number>
+    {
+        return [...this.taskIds];
+    }
+    /**
+     * 
+     * @param inMap Map of proj:taskLists from localstorage or other source
+     */
+    setTaskMap(inMap:Map<string,TaskItem[]>)
+    {
+        this.taskMap = inMap;
+    }
+    /**
+     * 
+     * @param inArray Array of taskIds from local storage or other source
+     */
+    setTaskIds(inArray:Array<number>)
+    {
+        this.taskIds = inArray;
+    }
+    /*
     Task Fetching
     */
+    getTaskForProj(projectName:string):TaskItem[]|undefined
+    {
+        return this.taskMap.get(projectName)
+    }
     getTask(id:number): TaskItem | null
     {
         let rv = null;
@@ -97,9 +107,6 @@ export class TaskDatabase
         return this.getMaxId()+1;
     }
 
-    /*
-    Map Operations
-    */
     /**
      * 
      * @param task TaskItem to add to map and local storage 
@@ -107,40 +114,26 @@ export class TaskDatabase
      */
     addTask(task:TaskItem):void
     {
-        console.log(`Pre add`);
-        console.log(this.taskMap);
+        // console.log(`Pre add`);
+        // console.log(this.taskMap);
         
-        let projName:string;
-        if (task.projectName == null)
-        {
-            projName = "NOPROJ";
-        }
-        else
-        {
-            projName = task.projectName;
-        }
+        const projName:string = task.projectName;
         
         // TODO Might have to make a shallow copy of array
         //list to update
         const taskArray:Array<TaskItem> = this.getVal(projName);
         //Local update
         taskArray.push(task);
-        console.log(`Post add`);
-        console.log(this.taskMap);
+        // console.log(`Post add`);
+        // console.log(this.taskMap);
         
+        //Update ids
+        this.taskIds.push(task.id);
         // Subject specific update
-        const projSub = this.projectSubjects.get(projName)!;
-        projSub.next(taskArray);
-        
-        //All tasks update subscribers
-        const allTaskSub = this.projectSubjects.get("ALL")!;
-        const currentAllTasks = this.getAllTasks();
-        allTaskSub.next(currentAllTasks);
-        console.log("Sending this array to all ");
-        console.log(currentAllTasks);
-        
+        this.updateSubject(projName,taskArray)
+        // All tasks update subscribers
+        this.updateSubject(DatabaseKeys.All,this.getAllTasks());
     }
-
 
     getVal(project:string):Array<TaskItem>
     {
@@ -162,6 +155,46 @@ export class TaskDatabase
             combinedArray = combinedArray.concat(taskList);
         }
         return combinedArray;
+    }
+    
+    /*
+    Subject specific functions
+    */
+   
+    /**
+     * 
+     * @param project Project to attempt intialization of new subject
+     * @returns true if subject does not exist, false if project subject already initialized
+     */
+    //TODO on referesh, there might be some breaking of the subjects with data is set from storage
+    intializeProjectSub(project:string):boolean
+    {   
+        if(this.projectSubjects.get(project) == undefined)
+        {
+            const newSubject = new BehaviorSubject<TaskItem[]>([])
+            this.projectSubjects.set(project,newSubject);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * 
+     * @param project Project to attempt to get subject for
+     * @returns subject or undefined if no subject has been initialized
+     */
+    getSubject(project:string):Subject<Array<TaskItem>> | undefined
+    {
+        return this.projectSubjects.get(project);
+    }
+
+    updateSubject(projectName:string,newVal:TaskItem[])
+    {
+        const projSub = this.projectSubjects.get(projectName)!;
+        projSub.next(newVal);
     }
 
 
