@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { TimerService } from '../services/timer.service';
 import { Observable, Subscription, take, timer } from 'rxjs';
 
@@ -8,7 +8,7 @@ import { Observable, Subscription, take, timer } from 'rxjs';
   templateUrl: './time-player.component.html',
   styleUrl: './time-player.component.scss'
 })
-export class TimePlayerComponent {
+export class TimePlayerComponent implements OnDestroy{
     currentMinutes:number = 25;
     currentSeconds:number = 0;
     timerSub = new Subscription();
@@ -18,5 +18,9 @@ export class TimePlayerComponent {
         this.timerSub = this.numberToTake.subscribe((x)=>{
             console.log('Next val: ',x);
         });
+    }
+
+    ngOnDestroy(): void {
+        this.timerSub.unsubscribe();
     }
 }
