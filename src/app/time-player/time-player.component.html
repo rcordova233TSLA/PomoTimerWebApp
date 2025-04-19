@@ -7,10 +7,12 @@
             <p>Seconds</p>
         </div>
         <div class="times">
-            <p #minutess></p>
-            <p #seconds></p>
+            <p #minutes>{{minutesLeft}} </p>
+            <p #seconds> {{secondsLeft}} </p>
         </div>
-    
     </div>
 </div>
 
+<button (click)="onStartButton()"> Start </button>
+<button (click)="onPauseButton()"> Pause</button>
+<button (click)="onResetButton()"> Reset </button>
