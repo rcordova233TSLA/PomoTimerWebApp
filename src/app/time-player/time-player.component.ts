@@ -1,13 +1,8 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { TimerService } from '../services/timer.service';
+import { TimerService, TimerState } from '../services/timer.service';
 import { Observable, Subscription, take, timer } from 'rxjs';
 import { TimerConfig } from './TimerConfiguration';
-enum TimerState
-{
-    OFF,
-    PAUSED,
-    RUNNING
-}
+
 @Component({
   selector: 'app-time-player',
   imports: [],
@@ -15,15 +10,20 @@ enum TimerState
   styleUrl: './time-player.component.scss'
 })
 export class TimePlayerComponent implements OnDestroy,OnChanges{
-    state:TimerState;
     @Input() configuration:TimerConfig = {minutes:25,seconds:0};
     minutesLeft!:number;
     secondsLeft!:number;
     currentSub!: Subscription
+    stateSub:Subscription
+    timerState!:TimerState;
     constructor(private timerService:TimerService){
         timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
         this.setTimeBasedOfCfg();
-        this.state = TimerState.OFF;
+        this.stateSub = timerService.getStateSubject().subscribe((state)=>
+        {
+            this.timerState = state;
+        }
+        )
     }
     setTimeBasedOfCfg()
     {
@@ -52,7 +52,6 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
 	{
         if (!this.isTimerRunning())
         {
-            this.state = TimerState.RUNNING;
             console.log("Starting Timer");
             const intervalObservable = this.timerService.StartTimer()
             this.currentSub = intervalObservable.subscribe(
@@ -71,14 +70,12 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
     }
     onPauseButton()
     {
-        this.state = TimerState.PAUSED
         this.currentSub.unsubscribe()
-        this.timerService.StopTimer()
+        this.timerService.PauseTimer()
     }
 
     onResetButton()
     {
-        this.state = TimerState.OFF
         if (this.currentSub!=undefined || this.currentSub!=null)
         {
             this.currentSub.unsubscribe()
@@ -88,7 +85,8 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
     }
     isTimerRunning()
     {
-        if(this.state==TimerState.RUNNING)
+        
+        if(this.timerState == TimerState.RUNNING)
         {
             return true;
         }
@@ -96,10 +94,6 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
     }
     isTimerPaused()
     {
-        if(this.state==TimerState.PAUSED)
-        {
-            return true;
-        }
-        return false;
+        return this.timerService.isTimerPaused()
     }
 }
