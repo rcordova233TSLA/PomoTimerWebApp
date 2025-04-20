@@ -1,0 +1,8 @@
+<label for="minutes">Minutes</label>
+<input #minutes type="number" name="minutes" step="1" [(ngModel)]="minutesInput">
+<label for="seconds">Seconds</label>
+<input #seconds type="number" name="seconds" step="1" [(ngModel)]="secondsInput">
+<button (click)="onSetTimerButton()"> Set Timer</button>
+<app-time-player
+    [configuration]="configuration"
+></app-time-player>
