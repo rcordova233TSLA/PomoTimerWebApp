@@ -6,7 +6,8 @@ export enum TimerState
     OFF,
     PAUSED,
     RUNNING,
-    FINISHED
+    FINISHED,
+    RESTART
 }
 @Injectable({
   providedIn: 'root'
@@ -112,14 +113,14 @@ export class TimerService {
 
     PauseTimer()
     {
-        this.state = TimerState.PAUSED
+        this.updateState(TimerState.PAUSED)
         this.activeInterval = null;
         this.counterSubscription.unsubscribe()
     }
     
     ResetTimer()
     {
-        this.state = TimerState.OFF;
+        this.updateState(TimerState.RESTART)
         if (this.counterSubscription!=undefined || this.counterSubscription!=null)
         {
             this.counterSubscription.unsubscribe()
@@ -140,31 +141,14 @@ export class TimerService {
         this.activeInterval = null;
         this.startTime = null;
     }
-    //TODO replace isTimerRunning/Paused with getState and move check to caller of service method 
-    isTimerRunning()
-    {
-        if(this.state==TimerState.RUNNING)
-        {
-            return true;
-        }
-        return false;
-    }
-    isTimerPaused()
-    {
-        if(this.state==TimerState.PAUSED)
-        {
-            return true;
-        }
-        return false;
-    }
     /**
      * 
      * @returns true if internal counter reaches configured duration time
-     */
-    isTimerFinished():boolean
-    {
+    */
+   isTimerFinished():boolean
+   {
         if ((this.internalCounter+1) == this.configuredDuration)
-        {
+            {
             return true;
         }
         return false;
@@ -189,5 +173,26 @@ export class TimerService {
         const minutesWhole = Math.floor(seconds/60)
         const remainingSeconds = seconds%60
         return {minutes:minutesWhole,seconds:remainingSeconds}
+    }
+
+
+
+    // Functions to consider deleting
+    //TODO replace isTimerRunning/Paused with getState and move check to caller of service method 
+    isTimerRunning()
+    {
+        if(this.state==TimerState.RUNNING)
+        {
+            return true;
+        }
+        return false;
+    }
+    isTimerPaused()
+    {
+        if(this.state==TimerState.PAUSED)
+        {
+            return true;
+        }
+        return false;
     }
 }

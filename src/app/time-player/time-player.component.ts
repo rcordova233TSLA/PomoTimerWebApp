@@ -13,15 +13,15 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
     @Input() configuration:Duration = {minutes:25,seconds:0};
     minutesLeft!:number;
     secondsLeft!:number;
-    currentSub!: Subscription
     stateSub:Subscription
     timeLeftSub:Subscription
     timerState!:TimerState;
     canStart:boolean= ORIGINAL_BUTTON_STATE.start;
     canPause:boolean=ORIGINAL_BUTTON_STATE.pause;
+    message:string="Timer idle";
     constructor(private timerService:TimerService){
         timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
-        this.setTimeBasedOfCfg();
+        this.resetDisplay();
         this.stateSub = timerService.getStateSubject().subscribe((state)=>
         {
             this.monitorTimerState(state)
@@ -38,24 +38,23 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
         {
             this.canStart = false;
             this.canPause = true;
+            this.message = "Timer is running!"
         }
         else if (state == TimerState.PAUSED)
         {
-            this.canPause = false;
+            this.canPause  = false;
+            this.canStart = true;
+            this.message = "Timer is paused!"
         }
         else if (state == TimerState.FINISHED)
         {
             this.canStart = ORIGINAL_BUTTON_STATE.start;
             this.canPause = ORIGINAL_BUTTON_STATE.pause;
             this.resetDisplay()
+            this.message = "Timer is finished!"
         }
     }
     resetDisplay()
-    {
-        this.minutesLeft = this.configuration.minutes
-        this.secondsLeft = this.configuration.seconds
-    }
-    setTimeBasedOfCfg()
     {
         this.minutesLeft = this.configuration.minutes
         this.secondsLeft = this.configuration.seconds
@@ -71,11 +70,16 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
             
         }
     }
-    ngOnDestroy(): void {
-        if (this.currentSub!=undefined || this.currentSub!=null)
+    unsubscribe(subscription:Subscription)
+    {
+        if (subscription!=undefined || subscription!=null)
         {
-            this.currentSub.unsubscribe();
+                subscription.unsubscribe();
         }
+    }
+    ngOnDestroy(): void {
+        this.unsubscribe(this.stateSub);
+        this.unsubscribe(this.timeLeftSub);
     }
 
     onStartButton()
@@ -94,18 +98,13 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
     }
     onPauseButton()
     {
-        this.currentSub.unsubscribe()
         this.timerService.PauseTimer()
     }
 
     onResetButton()
     {
-        if (this.currentSub!=undefined || this.currentSub!=null)
-        {
-            this.currentSub.unsubscribe()
-        }
         this.timerService.ResetTimer()
-        this.setTimeBasedOfCfg()
+        this.resetDisplay()
     }
     isTimerRunning()
     {
