@@ -15,6 +15,7 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
     secondsLeft!:number;
     currentSub!: Subscription
     stateSub:Subscription
+    timeLeftSub:Subscription
     timerState!:TimerState;
     constructor(private timerService:TimerService){
         timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
@@ -24,6 +25,10 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
             this.timerState = state;
         }
         )
+        this.timeLeftSub = timerService.getTimeLeftSubject().subscribe((timeLeft)=>{
+            this.minutesLeft = timeLeft.minutes
+            this.secondsLeft = timeLeft.seconds
+        })
     }
     setTimeBasedOfCfg()
     {
@@ -53,13 +58,14 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
         if (!this.isTimerRunning())
         {
             console.log("Starting Timer");
-            const intervalObservable = this.timerService.StartTimer()
-            this.currentSub = intervalObservable.subscribe(
-                (secondsPassed)=>{
-                    console.log(secondsPassed);
-                    this.updateTimeFields()
-                }
-            )
+            this.timerService.StartTimer()
+            // const intervalObservable = this.timerService.StartTimer()
+            // this.currentSub = intervalObservable.subscribe(
+            //     (secondsPassed)=>{
+            //         console.log(secondsPassed);
+            //         this.updateTimeFields()
+            //     }
+            // )
         }
     }
     updateTimeFields()
