@@ -44,7 +44,7 @@ export class TimerService {
             this.internalSubscription = this.activeInterval.subscribe((count)=>{
                 this.internalCounter = count;
                 console.log("Internal Counter before if finished: %d",this.internalCounter);
-                if ((this.internalCounter+1) == this.configuredDuration)
+                if (this.isTimerFinished())
                 {
                     // Finished logic....
                     this.state == TimerState.FINISHED
@@ -96,6 +96,7 @@ export class TimerService {
         this.startTime = null;
     }
 
+    //TODO replace isTimerRunning/Paused with getState and move check to caller of service method 
     isTimerRunning()
     {
         if(this.state==TimerState.RUNNING)
@@ -111,5 +112,22 @@ export class TimerService {
             return true;
         }
         return false;
+    }
+    /**
+     * 
+     * @returns true if internal counter reaches configured duration time
+     */
+    isTimerFinished():boolean
+    {
+        if ((this.internalCounter+1) == this.configuredDuration)
+        {
+            return true;
+        }
+        return false;
+    }
+    updateState(state:TimerState)
+    {
+        this.state = state;
+        this.stateSubject.next(state);
     }
 }
