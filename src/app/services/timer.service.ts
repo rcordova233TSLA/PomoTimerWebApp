@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { interval, Observable,Subject,Subscription,take } from 'rxjs';
-import { TimerConfig } from '../time-player/TimerConfiguration';
+import { interval, min, Observable,Subject,Subscription,take } from 'rxjs';
+import { Duration } from '../time-player/TimerConfiguration';
 export enum TimerState
 {
     OFF,
@@ -19,11 +19,11 @@ export class TimerService {
     state:TimerState=TimerState.OFF;
     counterSubscription!:Subscription;
     stateSubject:Subject<TimerState>;
-    timeLeftSub:Subject<TimerConfig>
+    timeLeftSub:Subject<Duration>
     internalCounter:number = 0;
 
     constructor() {
-        this.timeLeftSub = new Subject<TimerConfig>; 
+        this.timeLeftSub = new Subject<Duration>; 
         this.stateSubject = new Subject<TimerState>;
         this.stateSubject.next(TimerState.OFF)
     }
@@ -81,6 +81,7 @@ export class TimerService {
             this.stateSubject.next(TimerState.FINISHED);
             console.log("TimerFinished");
         }
+        // this.timeLeftSub.next(this.secondsAsDuration(this.configuredDuration));
     }
     /**
      * 
@@ -173,21 +174,20 @@ export class TimerService {
         this.state = state;
         this.stateSubject.next(state);
     }
-    getMinutesLeft(count:number)
-    {
-        const minutesLeft = this.configuredDuration
-        return Math.floor(minutesLeft/60)
-    }
     /**
      * 
      * @param count number corresponding to seconds passed
      * @returns Object with minutes and seconds properties
      */
-    getRemainingTime(count:number):TimerConfig
+    getRemainingTime(count:number):Duration
     {
         const remainingTime = this.configuredDuration-count
-        const minutesLeft = Math.floor(remainingTime/60)
-        const secondsLeft = remainingTime%60
-        return {minutes:minutesLeft,seconds:secondsLeft}
+        return this.secondsAsDuration(remainingTime)
+    }
+    secondsAsDuration(seconds:number):Duration
+    {
+        const minutesWhole = Math.floor(seconds/60)
+        const remainingSeconds = seconds%60
+        return {minutes:minutesWhole,seconds:remainingSeconds}
     }
 }

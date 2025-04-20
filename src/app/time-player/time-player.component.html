@@ -13,6 +13,6 @@
     </div>
 </div>
 
-<button [disabled]="isTimerRunning()" (click)="onStartButton()"> Start </button>
-<button [disabled]="isTimerPaused()" (click)="onPauseButton()"> Pause</button>
+<button [disabled]="!canStart" (click)="onStartButton()"> Start </button>
+<button [disabled]="!canPause" (click)="onPauseButton()"> Pause</button>
 <button (click)="onResetButton()"> Reset </button>

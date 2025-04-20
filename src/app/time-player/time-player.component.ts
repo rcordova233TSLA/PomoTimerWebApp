@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { TimerService, TimerState } from '../services/timer.service';
 import { Observable, Subscription, take, timer } from 'rxjs';
-import { TimerConfig } from './TimerConfiguration';
-
+import { Duration } from './TimerConfiguration';
+const ORIGINAL_BUTTON_STATE = {start:true,pause:false}
 @Component({
   selector: 'app-time-player',
   imports: [],
@@ -10,25 +10,50 @@ import { TimerConfig } from './TimerConfiguration';
   styleUrl: './time-player.component.scss'
 })
 export class TimePlayerComponent implements OnDestroy,OnChanges{
-    @Input() configuration:TimerConfig = {minutes:25,seconds:0};
+    @Input() configuration:Duration = {minutes:25,seconds:0};
     minutesLeft!:number;
     secondsLeft!:number;
     currentSub!: Subscription
     stateSub:Subscription
     timeLeftSub:Subscription
     timerState!:TimerState;
+    canStart:boolean= ORIGINAL_BUTTON_STATE.start;
+    canPause:boolean=ORIGINAL_BUTTON_STATE.pause;
     constructor(private timerService:TimerService){
         timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
         this.setTimeBasedOfCfg();
         this.stateSub = timerService.getStateSubject().subscribe((state)=>
         {
-            this.timerState = state;
+            this.monitorTimerState(state)
         }
         )
         this.timeLeftSub = timerService.getTimeLeftSubject().subscribe((timeLeft)=>{
             this.minutesLeft = timeLeft.minutes
             this.secondsLeft = timeLeft.seconds
         })
+    }
+    monitorTimerState(state:TimerState)
+    {
+        if (state==TimerState.RUNNING)
+        {
+            this.canStart = false;
+            this.canPause = true;
+        }
+        else if (state == TimerState.PAUSED)
+        {
+            this.canPause = false;
+        }
+        else if (state == TimerState.FINISHED)
+        {
+            this.canStart = ORIGINAL_BUTTON_STATE.start;
+            this.canPause = ORIGINAL_BUTTON_STATE.pause;
+            this.resetDisplay()
+        }
+    }
+    resetDisplay()
+    {
+        this.minutesLeft = this.configuration.minutes
+        this.secondsLeft = this.configuration.seconds
     }
     setTimeBasedOfCfg()
     {
@@ -59,13 +84,6 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
         {
             console.log("Starting Timer");
             this.timerService.StartTimer()
-            // const intervalObservable = this.timerService.StartTimer()
-            // this.currentSub = intervalObservable.subscribe(
-            //     (secondsPassed)=>{
-            //         console.log(secondsPassed);
-            //         this.updateTimeFields()
-            //     }
-            // )
         }
     }
     updateTimeFields()
