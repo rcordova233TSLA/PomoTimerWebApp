@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { TimePlayerComponent } from '../time-player/time-player.component';
 import { FormsModule } from '@angular/forms';
 import { TimerConfig } from '../time-player/TimerConfiguration';
+const TEST_TIME:TimerConfig = {minutes:0,seconds:5}
 @Component({
   selector: 'app-test-timer',
   imports: [TimePlayerComponent,FormsModule],
@@ -9,9 +10,9 @@ import { TimerConfig } from '../time-player/TimerConfiguration';
   styleUrl: './test-timer.component.scss'
 })
 export class TestTimerComponent {
-    minutesInput:number=25;
-    secondsInput:number = 0;
-    configuration:TimerConfig = {minutes:25,seconds:0}
+    minutesInput:number=TEST_TIME.minutes;
+    secondsInput:number = TEST_TIME.seconds;
+    configuration:TimerConfig = {minutes:TEST_TIME.minutes,seconds:TEST_TIME.seconds}
     constructor(){
         
     }
