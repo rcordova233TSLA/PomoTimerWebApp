@@ -66,20 +66,22 @@ export class TimerService {
      */
     pumpCounter(count:number)
     {
-        this.internalCounter = count;
+        this.internalCounter++;
         console.log('internal counter %d',this.internalCounter);
         console.log("TimerState: %d",this.state)
-        const timeLeft = this.getRemainingTime(count+1)
+        const timeLeft = this.getRemainingTime()
         this.timeLeftSub.next(timeLeft) 
     }
     onTimerComplete()
     {
         console.log("Internal Counter before if finished: %d",this.internalCounter);
+        //TODO Consider getting rid of isTimerFinished
         if (this.isTimerFinished())
         {
             // Finished logic....
             this.state == TimerState.FINISHED
             this.stateSubject.next(TimerState.FINISHED);
+            this.internalCounter = 0;
             console.log("TimerFinished");
         }
         // this.timeLeftSub.next(this.secondsAsDuration(this.configuredDuration));
@@ -91,23 +93,32 @@ export class TimerService {
     //TODO make this method less confusing.... split up into smaller functions
     StartTimer():Observable<number>
     {
-        if (this.startTime == null)
+        // if (this.startTime == null)
+        // {
+        //     // Fresh start after reset or upon first start
+        //     // this.startTime = Date.now()/1000
+        //     this.activeInterval = this.createNewInterval(this.configuredDuration);
+        //     this.startInternalCounter()
+        // }
+        // else
+        // {
+            //Assuming a pause/start has happened
+            // const currentTime = Date.now()/1000
+        // }
+        let timeLeft:number;
+        if (this.internalCounter == 0)
         {
-            // Fresh start after reset or upon first start
-            // this.startTime = Date.now()/1000
-            this.activeInterval = this.createNewInterval(this.configuredDuration);
-            this.startInternalCounter()
+            timeLeft = this.configuredDuration//Counter starts at 0
+
         }
         else
         {
-            //Assuming a pause/start has happened
-            // const currentTime = Date.now()/1000
-            const timeLeft:number = this.configuredDuration - (this.internalCounter+1) //Counter starts at 0
-            this.activeInterval = this.createNewInterval(timeLeft)
-            this.startInternalCounter()
+            timeLeft = this.configuredDuration - (this.internalCounter) //Counter starts at 0
+
         }
-        this.state = TimerState.RUNNING
-        this.stateSubject.next(TimerState.RUNNING)
+        this.activeInterval = this.createNewInterval(timeLeft)
+        this.startInternalCounter()
+        this.updateState(TimerState.RUNNING)
         return this.activeInterval;
     }
 
@@ -127,6 +138,7 @@ export class TimerService {
         }
         this.activeInterval = null;
         this.startTime = null;
+        this.internalCounter = 0;
     }
     //TODO implement cleanup function
     /**
@@ -147,7 +159,7 @@ export class TimerService {
     */
    isTimerFinished():boolean
    {
-        if ((this.internalCounter+1) == this.configuredDuration)
+        if ((this.internalCounter) == this.configuredDuration)
             {
             return true;
         }
@@ -163,9 +175,9 @@ export class TimerService {
      * @param count number corresponding to seconds passed
      * @returns Object with minutes and seconds properties
      */
-    getRemainingTime(count:number):Duration
+    getRemainingTime():Duration
     {
-        const remainingTime = this.configuredDuration-count
+        const remainingTime = this.configuredDuration-this.internalCounter
         return this.secondsAsDuration(remainingTime)
     }
     secondsAsDuration(seconds:number):Duration
