@@ -1,1 +1,16 @@
-<app-task-list></app-task-list>
+<div class="container">
+    <div class="row">
+        <div class="col-md">
+            <app-task-list></app-task-list>
+        </div>
+        <div class="col-md">
+            <app-time-player></app-time-player>
+            <app-time-player
+                [configuration]="{minutes:5,seconds:0}"
+            ></app-time-player>
+            <app-time-player
+                [configuration]="{minutes:15,seconds:0}"
+            ></app-time-player>
+        </div>
+    </div>
+</div>
