@@ -1,5 +1,4 @@
 .count-down-timer {
-    box-shadow: 2px 6px 9px 2px rgb(0 0 0 / 20%);
     text-align: center;
     background-color: black;
     color: white;
@@ -10,7 +9,8 @@
     .wrapper {
       .description, .times {
         display: grid;
-        grid-template-columns: repeat(4, calc(25% - 8px));
+        // grid-template-columns: repeat(2, calc(25% - 2px));
+        grid-template-columns: 1fr 1fr;;
         grid-column-gap: 10px;
       }
   
