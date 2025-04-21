@@ -1,0 +1,18 @@
+<!-- <h1> {{currentMinutes}} : {{currentSeconds}} </h1> -->
+ <!-- CSS HTML Modified by https://frontenddevelopment.tech/angular-countdown-timer/ -->
+<div class="count-down-timer">
+    <div class="wrapper">
+        <div class="description">
+            <p>Minutes</p>
+            <p>Seconds</p>
+        </div>
+        <div class="times">
+            <p #minutes>{{minutesLeft}} </p>
+            <p #seconds> {{secondsLeft}} </p>
+        </div>
+    </div>
+</div>
+<p>{{message}}</p>
+<button [disabled]="!canStart" (click)="onStartButton()"> Start </button>
+<button [disabled]="!canPause" (click)="onPauseButton()"> Pause</button>
+<button [disabled]="!canRestart" (click)="onResetButton()"> Reset </button>
