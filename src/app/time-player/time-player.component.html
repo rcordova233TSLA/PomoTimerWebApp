@@ -15,4 +15,4 @@
 <p>{{message}}</p>
 <button [disabled]="!canStart" (click)="onStartButton()"> Start </button>
 <button [disabled]="!canPause" (click)="onPauseButton()"> Pause</button>
-<button (click)="onResetButton()"> Reset </button>
+<button [disabled]="!canRestart" (click)="onResetButton()"> Reset </button>

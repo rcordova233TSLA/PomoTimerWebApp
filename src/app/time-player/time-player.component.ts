@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/
 import { TimerService, TimerState } from '../services/timer.service';
 import { Observable, Subscription, take, timer } from 'rxjs';
 import { Duration } from './TimerConfiguration';
-const ORIGINAL_BUTTON_STATE = {start:true,pause:false}
+const ORIGINAL_BUTTON_STATE = {start:true,pause:false,restart:false}
 @Component({
   selector: 'app-time-player',
   imports: [],
@@ -18,6 +18,7 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
     timerState!:TimerState;
     canStart:boolean= ORIGINAL_BUTTON_STATE.start;
     canPause:boolean=ORIGINAL_BUTTON_STATE.pause;
+    canRestart:boolean = ORIGINAL_BUTTON_STATE.restart
     message:string="Timer idle";
     constructor(private timerService:TimerService){
         timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
@@ -38,21 +39,37 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
         {
             this.canStart = false;
             this.canPause = true;
+            this.canRestart = true;
             this.message = "Timer is running!"
         }
         else if (state == TimerState.PAUSED)
         {
             this.canPause  = false;
             this.canStart = true;
+            this.canRestart = true;
             this.message = "Timer is paused!"
         }
         else if (state == TimerState.FINISHED)
         {
-            this.canStart = ORIGINAL_BUTTON_STATE.start;
-            this.canPause = ORIGINAL_BUTTON_STATE.pause;
+            this.resetButtonStates()
             this.resetDisplay()
             this.message = "Timer is finished!"
+            // Other finish logic relating to tasks
+        }else if (state == TimerState.RESTART)
+        {
+            this.resetButtonStates()
+            this.resetDisplay()
+            this.message = "Timer is Restarted!"
+        }else if (state == TimerState.OFF)
+        { 
+            this.message="Timer idle"
         }
+    }
+    resetButtonStates()
+    {
+        this.canStart = ORIGINAL_BUTTON_STATE.start;
+        this.canPause = ORIGINAL_BUTTON_STATE.pause;
+        this.canRestart = ORIGINAL_BUTTON_STATE.restart;
     }
     resetDisplay()
     {
@@ -67,7 +84,6 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
             console.log("Reset Timer");
             console.log("Configuring service to new config");
             this.timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
-            
         }
     }
     unsubscribe(subscription:Subscription)

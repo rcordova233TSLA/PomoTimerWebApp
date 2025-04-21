@@ -26,7 +26,7 @@ export class TimerService {
     constructor() {
         this.timeLeftSub = new Subject<Duration>; 
         this.stateSubject = new Subject<TimerState>;
-        this.stateSubject.next(TimerState.OFF)
+        this.stateSubject.next(this.state)
     }
     getStateSubject()
     {
@@ -131,13 +131,8 @@ export class TimerService {
     
     ResetTimer()
     {
-        this.updateState(TimerState.RESTART)
-        if (this.counterSubscription!=undefined || this.counterSubscription!=null)
-        {
-            this.counterSubscription.unsubscribe()
-        }
-        this.activeInterval = null;
-        this.startTime = null;
+        this.updateState(TimerState.RESTART);
+        this.cleanUp();
         this.internalCounter = 0;
     }
     //TODO implement cleanup function
