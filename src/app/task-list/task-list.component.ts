@@ -45,7 +45,14 @@ export class TaskListComponent implements OnInit,OnDestroy {
         
         // this.taskList = this.taskFetcher.getAllTasks();
     }
+    onEdit()
+    {
 
+    }
+    onDelete()
+    {
+        
+    }
     ngOnDestroy(): void {
         this.subscription.unsubscribe()
     }
