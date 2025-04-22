@@ -75,4 +75,10 @@ export class TaskFetcherService {
     {
         return this.taskDatabase.getAllTasks();
     }
+    deleteTask(task:TaskItem)
+    {
+        this.taskDatabase.deleteTask(task);
+        this.storageSaver.updateProject(task.projectName,this.taskDatabase.getTaskForProj(task.projectName)!)
+        this.storageSaver.updateTaskIds(this.taskDatabase.getTaskIds()) 
+    }
 }

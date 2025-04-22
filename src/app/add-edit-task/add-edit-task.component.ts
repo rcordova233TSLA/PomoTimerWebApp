@@ -56,16 +56,15 @@ export class AddEditTaskComponent implements OnInit{
         if (!form.valid)
         {
             console.log("Form has missing values");
-            
+            return;
         }
-        else
+        //Save to list
+        if (this.state == State.CREATE)
         {
             console.log("Adding task");
-            
-            //Save to list
             this.taskFetcher.addTask(this.task);
-            this.router.navigate(['/'])
         }
+        this.router.navigate(['/'])
     }
     onCancel()
     {

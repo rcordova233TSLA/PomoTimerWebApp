@@ -1,11 +1,23 @@
 <ul>
     @for (task of taskList; track $index) {
-        <app-task-card
-            [id]="task.id"
-            [description]="task.description"
-            [label]="task.label"
-            [project]="task.projectName"
-        >
-        </app-task-card>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <app-task-card
+                        [id]="task.id"
+                        [description]="task.description"
+                        [label]="task.label"
+                        [project]="task.projectName"
+                    >
+                    </app-task-card>
+                </div>
+                <div class="col-auto px-0 me-2">
+                    <button (click)="onEdit(task.id)">Edit</button>
+                </div>
+                <div class="col-auto px-0">
+                    <button (click)="onDelete(task.id)">Delete</button>
+                </div>
+            </div>
+        </div>
     }
 </ul>

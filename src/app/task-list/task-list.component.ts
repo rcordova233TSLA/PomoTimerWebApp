@@ -2,7 +2,8 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TaskCardComponent } from '../task-card/task-card.component';
 import { TaskFetcherService } from '../services/task-fetcher.service';
 import { TaskItem } from '../services/TaskItem';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-task-list',
@@ -15,7 +16,8 @@ export class TaskListComponent implements OnInit,OnDestroy {
     @Input() subjectKey!:string;
     subscription!: Subscription;
     // subject!: Subject<Array<TaskItem>>;
-    constructor(private taskFetcher:TaskFetcherService)
+    constructor(private taskFetcher:TaskFetcherService,
+                private router:Router)
     {
 
     }
@@ -45,7 +47,14 @@ export class TaskListComponent implements OnInit,OnDestroy {
         
         // this.taskList = this.taskFetcher.getAllTasks();
     }
-
+    onEdit(taskId:number)
+    {
+        this.router.navigate(['/editTask',taskId])
+    }
+    onDelete(taskId:number)
+    {
+        this.router.navigate(['deleteTask',taskId])
+    }
     ngOnDestroy(): void {
         this.subscription.unsubscribe()
     }

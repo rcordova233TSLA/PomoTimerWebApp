@@ -1,0 +1,17 @@
+@if (task !=null) {
+    <div>
+        <h1>Are you sure you want to delete this task?</h1>
+        <app-task-card
+            [description]="task.description"
+            [id]="task.id"
+            [label]="task.label"
+            [project]="task.projectName"
+        ></app-task-card>
+        <button (click)="onDelete()">Delete</button>
+        <button (click)="onCancel()">Cancel</button>
+    </div>
+}@else {
+    <div #elseBlock>
+        <h1>The task provided is not a valid task</h1>
+    </div>
+}
