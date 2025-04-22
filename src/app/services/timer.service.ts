@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { interval, min, Observable,Subject,Subscription,take } from 'rxjs';
+import { BehaviorSubject, interval, min, Observable,Subject,Subscription,take } from 'rxjs';
 import { Duration } from '../time-player/TimerConfiguration';
 export enum TimerState
 {
@@ -19,13 +19,13 @@ export class TimerService {
     activeInterval:Observable<number>|null=null;
     state:TimerState=TimerState.OFF;
     counterSubscription!:Subscription;
-    stateSubject:Subject<TimerState>;
+    stateSubject:BehaviorSubject<TimerState>;
     timeLeftSub:Subject<Duration>
     internalCounter:number = 0;
 
     constructor() {
         this.timeLeftSub = new Subject<Duration>; 
-        this.stateSubject = new Subject<TimerState>;
+        this.stateSubject = new BehaviorSubject<TimerState>(TimerState.OFF);
         this.stateSubject.next(this.state)
     }
     getStateSubject()
@@ -67,8 +67,8 @@ export class TimerService {
     pumpCounter(count:number)
     {
         this.internalCounter++;
-        console.log('internal counter %d',this.internalCounter);
-        console.log("TimerState: %d",this.state)
+        // console.log('Pump:internal counter %d',this.internalCounter);
+        // console.log("Pump:TimerState: %d",this.state)
         const timeLeft = this.getRemainingTime()
         this.timeLeftSub.next(timeLeft) 
     }

@@ -1,6 +1,6 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { TimerService, TimerState } from '../services/timer.service';
-import { Observable, Subscription, take, timer } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Duration } from './TimerConfiguration';
 const ORIGINAL_BUTTON_STATE = {start:true,pause:false,restart:false}
 @Component({
@@ -9,32 +9,54 @@ const ORIGINAL_BUTTON_STATE = {start:true,pause:false,restart:false}
   templateUrl: './time-player.component.html',
   styleUrl: './time-player.component.scss'
 })
-export class TimePlayerComponent implements OnDestroy,OnChanges{
+export class TimePlayerComponent implements OnDestroy,OnChanges,OnInit{
     @Input() configuration:Duration = {minutes:25,seconds:0};
     minutesLeft!:number;
     secondsLeft!:number;
-    stateSub:Subscription
-    timeLeftSub:Subscription
+    stateSub!:Subscription
+    timeLeftSub!:Subscription
     timerState!:TimerState;
     canStart:boolean= ORIGINAL_BUTTON_STATE.start;
     canPause:boolean=ORIGINAL_BUTTON_STATE.pause;
     canRestart:boolean = ORIGINAL_BUTTON_STATE.restart
     message:string="Timer idle";
-    constructor(private timerService:TimerService){
-        timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
+    constructor(private timerService:TimerService){}
+    ngOnInit(): void {
+        console.log("TimerPlayer is being initialized");
+        
+        this.timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
         this.resetDisplay();
-        this.stateSub = timerService.getStateSubject().subscribe((state)=>
-        {
-            this.monitorTimerState(state)
-        }
+        this.stateSub = this.timerService.getStateSubject().subscribe((state)=>
+            {
+                console.log(`State:${state}`);
+                this.monitorTimerState(state)
+            }
         )
-        this.timeLeftSub = timerService.getTimeLeftSubject().subscribe((timeLeft)=>{
+        this.timeLeftSub = this.timerService.getTimeLeftSubject().subscribe(
+            (timeLeft)=>{
             this.minutesLeft = timeLeft.minutes
             this.secondsLeft = timeLeft.seconds
-        })
+            })
+    }
+    ngOnDestroy(): void {
+        console.log("TimerPlayer is being destroyed!");
+        this.unsubscribe(this.stateSub);
+        this.unsubscribe(this.timeLeftSub);
+    }
+    ngOnChanges(changes: SimpleChanges): void {
+        if(changes['configuration'])
+        {
+            console.log("timer config changed");
+            this.onResetButton()
+            console.log("Reset Timer");
+            console.log("Configuring service to new config");
+            this.timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
+        }
     }
     monitorTimerState(state:TimerState)
     {
+        console.log(`In monitorTimerState: ${state}`);
+        
         if (state==TimerState.RUNNING)
         {
             this.canStart = false;
@@ -76,26 +98,12 @@ export class TimePlayerComponent implements OnDestroy,OnChanges{
         this.minutesLeft = this.configuration.minutes
         this.secondsLeft = this.configuration.seconds
     }
-    ngOnChanges(changes: SimpleChanges): void {
-        if(changes['configuration'])
-        {
-            console.log("timer config changed");
-            this.onResetButton()
-            console.log("Reset Timer");
-            console.log("Configuring service to new config");
-            this.timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
-        }
-    }
     unsubscribe(subscription:Subscription)
     {
         if (subscription!=undefined || subscription!=null)
         {
                 subscription.unsubscribe();
         }
-    }
-    ngOnDestroy(): void {
-        this.unsubscribe(this.stateSub);
-        this.unsubscribe(this.timeLeftSub);
     }
 
     onStartButton()
