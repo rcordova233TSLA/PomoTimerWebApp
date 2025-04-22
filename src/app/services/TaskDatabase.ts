@@ -38,6 +38,18 @@ export class TaskDatabase
     {
         return [...this.taskIds];
     }
+    deleteTask(task:TaskItem)
+    {
+        const activeArray:Array<TaskItem> = this.taskMap.get(task.projectName)!;
+        activeArray.splice(activeArray.indexOf(task),1)
+        this.taskIds.splice(this.taskIds.indexOf(task.id),1)
+        //Update ids
+        this.taskIds.splice(task.id);
+        // Subject specific update
+        this.updateSubject(task.projectName,activeArray)
+        // All tasks update subscribers
+        this.updateSubject(DatabaseKeys.All,this.getAllTasks());
+    }
     /**
      * 
      * @param inMap Map of proj:taskLists from localstorage or other source

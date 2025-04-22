@@ -6,6 +6,7 @@ import { MainViewComponent } from './main-view/main-view.component';
 import { TaskListComponent } from './task-list/task-list.component';
 import { TimePlayerComponent } from './time-player/time-player.component';
 import { TestTimerComponent } from './test-timer/test-timer.component';
+import { DeleteTaskComponent } from './delete-task/delete-task.component';
 
 export const routes: Routes = [{path:'taskCard',component:TaskCardComponent},
     {path:'',component:MainViewComponent},
@@ -14,5 +15,6 @@ export const routes: Routes = [{path:'taskCard',component:TaskCardComponent},
     {path:'testcardgen',component:TestCardGenComponent},
     {path:'testTimer',component:TestTimerComponent},
     {path:'addTask',component:AddEditTaskComponent},
-    {path:'editTask/:id',component:AddEditTaskComponent}
+    {path:'editTask/:id',component:AddEditTaskComponent},
+    {path:'deleteTask/:id',component:DeleteTaskComponent}
 ];

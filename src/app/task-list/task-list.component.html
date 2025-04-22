@@ -12,10 +12,10 @@
                     </app-task-card>
                 </div>
                 <div class="col-auto px-0 me-2">
-                    <button>Edit</button>
+                    <button (click)="onEdit(task.id)">Edit</button>
                 </div>
                 <div class="col-auto px-0">
-                    <button>Delete</button>
+                    <button (click)="onDelete(task.id)">Delete</button>
                 </div>
             </div>
         </div>
