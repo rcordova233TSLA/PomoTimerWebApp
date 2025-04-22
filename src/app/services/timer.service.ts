@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, interval, min, Observable,Subject,Subscription,take } from 'rxjs';
+import { BehaviorSubject, interval, Observable,Subject,Subscription,take } from 'rxjs';
 import { Duration } from '../time-player/TimerConfiguration';
 export enum TimerState
 {
