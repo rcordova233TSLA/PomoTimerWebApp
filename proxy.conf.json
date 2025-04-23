@@ -1,0 +1,11 @@
+{
+    "/api/**":{
+        "target":"https://api.collinsdictionary.com",
+        "secure":false,
+        "changeOrigin":true,
+        "pathRewrite":{
+            "^/api":"https://api.collinsdictionary.com"
+        }
+    }
+
+}

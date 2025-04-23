@@ -8,6 +8,7 @@ import { TimePlayerComponent } from './time-player/time-player.component';
 import { TestTimerComponent } from './test-timer/test-timer.component';
 import { DeleteTaskComponent } from './delete-task/delete-task.component';
 import { TestSprintBreakComponent } from './test-sprint-break/test-sprint-break.component';
+import { TestWordViewComponent } from './test-word-view/test-word-view.component';
 
 export const routes: Routes = [{path:'taskCard',component:TaskCardComponent},
     {path:'',component:MainViewComponent},
@@ -18,5 +19,6 @@ export const routes: Routes = [{path:'taskCard',component:TaskCardComponent},
     {path:'testTimer',component:TestTimerComponent},
     {path:'addTask',component:AddEditTaskComponent},
     {path:'editTask/:id',component:AddEditTaskComponent},
-    {path:'deleteTask/:id',component:DeleteTaskComponent}
+    {path:'deleteTask/:id',component:DeleteTaskComponent},
+    {path:'testWordView',component:TestWordViewComponent}
 ];
