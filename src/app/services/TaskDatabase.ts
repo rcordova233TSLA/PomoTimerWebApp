@@ -1,5 +1,18 @@
 import { BehaviorSubject, Subject } from "rxjs";
-import { TaskItem } from "./TaskItem";
+import { TaskItem, TaskProperties } from "./TaskItem";
+export enum ChangeType
+{
+    LABEL,
+    PROJECT,
+    DESCRIPTION
+}
+export interface TaskChange
+{
+    task:TaskItem,
+    change: ChangeType,
+    oldVal:string,
+    newVal:string
+}
 export enum DatabaseKeys{
     All="ALL",
     NoProject = "NOPROJECT",
@@ -26,6 +39,74 @@ export class TaskDatabase
     /*
     DataStructure fetching
     */
+    updateTaskFields(task:TaskItem,updateObject:TaskProperties)
+    {
+        let taskToUpdate = task;
+        let change:TaskChange|undefined=undefined;
+        if (task.projectName != updateObject.projectName)
+        {
+            change = this.changeProject(task,updateObject.projectName)! ;
+            if (change == undefined)
+            {
+                return undefined;
+            }
+            taskToUpdate = change.task;
+        }
+        //Update other fields
+        // TODO should output a change Object
+        Object.assign(taskToUpdate,updateObject);
+        return change;
+    }
+    addNewProject(newProject:string)
+    {
+        if (this.taskMap.get(newProject)!=undefined)
+        {
+            return -1;
+        }
+        this.taskMap.set(newProject,[]);
+        this.intializeProjectSub(newProject);
+        return;
+    }
+    changeProject(task:TaskItem,newProject:string)
+    {
+        this.addNewProject(newProject);
+        const oldProject = task.projectName;
+        // Remove from old project
+        const oldArray = this.taskMap.get(oldProject);
+        if (oldArray == undefined)
+        {
+            return undefined;
+        }
+        // Old project cleanup
+        const idxToDelete:number = this.getIndexInArray(oldArray,task);
+        if (idxToDelete==-1)
+        {
+            return undefined;
+        }
+        const taskToMove = oldArray.splice(idxToDelete)[0];
+        taskToMove.projectName = newProject;
+        // Assign to new project
+        const newArrayRef = this.taskMap.get(newProject);
+        newArrayRef?.push(taskToMove);
+        // Subject specific update
+        this.updateSubject(newProject,newArrayRef!);
+        this.updateSubject(oldProject,oldArray);
+        // All tasks update subscribers
+        this.updateSubject(DatabaseKeys.All,this.getAllTasks());
+        const projectChange:TaskChange = {task:taskToMove,change:ChangeType.PROJECT,oldVal:oldProject,newVal:newProject}
+        return projectChange;
+    }
+    getIndexInArray(arrayRef:TaskItem[], task:TaskItem):number
+    {
+        for (let i=0;i<arrayRef.length;i++)
+        {
+            if (arrayRef[i].id == task.id)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
     getSizeTaskMap():number
     {
         return this.taskMap.size;
@@ -107,6 +188,7 @@ export class TaskDatabase
         }
         return rv;
     }
+ 
     /*
     Task Id operationss
     */

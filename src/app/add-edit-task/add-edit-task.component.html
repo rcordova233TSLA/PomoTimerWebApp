@@ -1,30 +1,33 @@
-<div class="form">
+<!-- <div class="form"> -->
+<form #f="ngForm" (ngSubmit)="onSubmit(f)">
     <h4>{{title}}</h4>
     <div class="form-container">
      <form #formRef="ngForm" (ngSubmit)="onSubmit(formRef)">
   
       <div class="form-group">
           <label for="id">Id</label>
-          <input type="text" name="id" [(ngModel)]="task.id"
-          [disabled]="task.id != null" class="form-control" required />
+          <div>
+              <input #taskId type="text" name="id" [ngModel]="task.id"
+              [readonly]="task.id != null" class="readonly-style" required />
+          </div>
       </div>
   
       <div class="form-group">
-          <label for="name">Task Label</label>
-          <input type="text" name="name" [(ngModel)]="task.label"
+          <label for="label">Task Label</label>
+          <input #inputLabel type="text" name="label" [ngModel]="task.label"
                               class="form-control" required />
       </div>
   
   
       <div class="form-group">
           <label for="address">Task Description</label>
-          <input type="text" name="address" [(ngModel)]="task.description"
+          <input #inputDesc type="text" name="description" [ngModel]="task.description"
                               class="form-control"/>
       </div>
   
       <div class="form-group">
-          <label for="phone">Project</label>
-          <input type="text" name="phone" [(ngModel)]="task.projectName"
+          <label for="projet">Project</label>
+          <input #inputProj type="text" name="projectName" [ngModel]="task.projectName"
                               class="form-control"/>
       </div>
       <button type="submit">Save</button>
@@ -32,4 +35,5 @@
   
      </form>
     </div>
-  </div>
+</form>
+  <!-- </div> -->
