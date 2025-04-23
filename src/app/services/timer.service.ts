@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, interval, Observable,Subject,Subscription,take } from 'rxjs';
+import { BehaviorSubject, interval, Observable,Subject,Subscription,take, timer } from 'rxjs';
 import { Duration } from '../time-player/TimerConfiguration';
 export enum TimerState
 {
@@ -27,6 +27,14 @@ export class TimerService {
         this.timeLeftSub = new Subject<Duration>; 
         this.stateSubject = new BehaviorSubject<TimerState>(TimerState.OFF);
         this.stateSubject.next(this.state)
+    }
+    /**
+     * Only use when subscriptions are not available 
+     * @returns The current state of the timer
+     */
+    getCurrentState():TimerState
+    {
+        return this.state;
     }
     getStateSubject()
     {
@@ -67,8 +75,8 @@ export class TimerService {
     pumpCounter(count:number)
     {
         this.internalCounter++;
-        // console.log('Pump:internal counter %d',this.internalCounter);
-        // console.log("Pump:TimerState: %d",this.state)
+        console.log('Pump:internal counter %d',this.internalCounter);
+        console.log("Pump:TimerState: %d",this.state)
         const timeLeft = this.getRemainingTime()
         this.timeLeftSub.next(timeLeft) 
     }

@@ -3,13 +3,15 @@ import {FormsModule, NgForm} from '@angular/forms';
 import { ActivatedRoute,Router } from '@angular/router';
 import { TaskFetcherService } from '../services/task-fetcher.service';
 import { TaskItem } from '../services/TaskItem';
+import { CommonModule } from '@angular/common';
 enum State{
     EDIT,
     CREATE
 }
+
 @Component({
   selector: 'app-add-edit-task',
-  imports: [FormsModule],
+  imports: [FormsModule,CommonModule],
   templateUrl: './add-edit-task.component.html',
   styleUrl: './add-edit-task.component.scss'
 })
@@ -53,6 +55,9 @@ export class AddEditTaskComponent implements OnInit{
 
     onSubmit(form:NgForm)
     {
+        console.log("Form value:");
+        console.log(form.value);
+        
         if (!form.valid)
         {
             console.log("Form has missing values");
@@ -62,9 +67,18 @@ export class AddEditTaskComponent implements OnInit{
         if (this.state == State.CREATE)
         {
             console.log("Adding task");
+            Object.assign(this.task,form.value);
             this.taskFetcher.addTask(this.task);
         }
+        else
+        {
+            console.log("Updating task");
+            this.taskFetcher.updateTask(this.task, form.value);            
+        }
+
         this.router.navigate(['/'])
+        console.log(`Task project ${this.task.projectName}`);
+        
     }
     onCancel()
     {

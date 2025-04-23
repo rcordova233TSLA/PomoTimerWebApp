@@ -11,6 +11,7 @@ const ORIGINAL_BUTTON_STATE = {start:true,pause:false,restart:false}
 })
 export class TimePlayerComponent implements OnDestroy,OnChanges,OnInit{
     @Input() configuration:Duration = {minutes:25,seconds:0};
+    @Input() overrideActiveTimer:boolean = false;
     minutesLeft!:number;
     secondsLeft!:number;
     stateSub!:Subscription
@@ -21,6 +22,10 @@ export class TimePlayerComponent implements OnDestroy,OnChanges,OnInit{
     canRestart:boolean = ORIGINAL_BUTTON_STATE.restart
     message:string="Timer idle";
     constructor(private timerService:TimerService){}
+    initializeTimer()
+    {
+
+    }
     ngOnInit(): void {
         console.log("TimerPlayer is being initialized");
         
@@ -40,23 +45,39 @@ export class TimePlayerComponent implements OnDestroy,OnChanges,OnInit{
     }
     ngOnDestroy(): void {
         console.log("TimerPlayer is being destroyed!");
-        this.unsubscribe(this.stateSub);
-        this.unsubscribe(this.timeLeftSub);
+        if (this.isTimerActive())
+        {
+            console.log("Active or Paused Timer....");
+        }
+        else
+        {
+            this.unsubscribe(this.stateSub);
+            this.unsubscribe(this.timeLeftSub);
+        }
     }
     ngOnChanges(changes: SimpleChanges): void {
         if(changes['configuration'])
         {
-            console.log("timer config changed");
-            this.onResetButton()
-            console.log("Reset Timer");
-            console.log("Configuring service to new config");
-            this.timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
+            if (this.overrideActiveTimer == false)
+            {
+                console.log("Override not provided");
+                console.log("Resuming active timer");
+            }
+            else
+            {
+                console.log("Override provided");
+                console.log("timer config changed");
+                this.onResetButton()
+                console.log("Reset Timer");
+                console.log("Configuring service to new config");
+                this.timerService.configureTimer(this.configuration.minutes,this.configuration.seconds)
+            }
         }
     }
     monitorTimerState(state:TimerState)
     {
         console.log(`In monitorTimerState: ${state}`);
-        
+        this.timerState = state;
         if (state==TimerState.RUNNING)
         {
             this.canStart = false;
@@ -129,6 +150,15 @@ export class TimePlayerComponent implements OnDestroy,OnChanges,OnInit{
     {
         this.timerService.ResetTimer()
         this.resetDisplay()
+    }
+    isTimerActive()
+    {
+        const currentState:TimerState = this.timerService.getCurrentState()
+        if (currentState== TimerState.RUNNING || currentState == TimerState.PAUSED)
+        {
+            return true;
+        }
+        return false;
     }
     isTimerRunning()
     {

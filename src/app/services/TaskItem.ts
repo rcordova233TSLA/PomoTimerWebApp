@@ -1,5 +1,13 @@
 import { DatabaseKeys } from "./TaskDatabase";
-export class TaskItem
+export interface TaskProperties
+{
+    id:number
+    // TODO Change back to mandatory in constructor?
+    label:string|null;
+    description:string|null;
+    projectName:string;
+}
+export class TaskItem implements TaskProperties
 {
     id:number
     // TODO Change back to mandatory in constructor?
